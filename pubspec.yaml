@@ -1,4 +1,4 @@
-﻿name: task_list_app
+name: task_list_app
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -37,6 +37,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   hive_flutter: ^1.1.0
+  google_fonts: ^3.0.1
 
 dev_dependencies:
   flutter_test:
