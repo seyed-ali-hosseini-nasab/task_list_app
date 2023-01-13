@@ -4,43 +4,204 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:task_list_app/data.dart';
 import 'package:task_list_app/main.dart';
 
-class EditTaskScreen extends StatelessWidget {
-  final TextEditingController _controller = TextEditingController();
+class EditTaskScreen extends StatefulWidget {
+  final Task task;
 
-  EditTaskScreen({super.key});
+  EditTaskScreen({super.key, required this.task});
+
+  @override
+  State<EditTaskScreen> createState() => _EditTaskScreenState();
+}
+
+class _EditTaskScreenState extends State<EditTaskScreen> {
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final Box<Task> box = Hive.box(taskBoxName);
+    final ThemeData themeData = Theme.of(context);
     return Scaffold(
+        backgroundColor: themeData.colorScheme.surface,
         appBar: AppBar(
+          elevation: 0,
+          backgroundColor: themeData.colorScheme.surface,
+          foregroundColor: themeData.colorScheme.onSurface,
           title: const Text('Edit Task'),
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            final Task task = Task();
-            task.name = _controller.text;
-            task.priority = Priority.low;
-            if (task.isInBox) {
-              task.save();
+            widget.task.name = _controller.text;
+            widget.task.priority = Priority.low;
+            if (widget.task.isInBox) {
+              widget.task.save();
             } else {
-              box.add(task);
+              box.add(widget.task);
             }
 
             Navigator.of(context).pop();
           },
-          label: const Text('Save Change'),
+          label: Row(
+            children: const [
+              Text('Save Change'),
+              Icon(
+                CupertinoIcons.check_mark,
+                size: 18,
+              ),
+            ],
+          ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        body: Column(
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Flex(
+                direction: Axis.horizontal,
+                children: [
+                  Flexible(
+                    flex: 1,
+                    child: PriorityCheckBox(
+                      label: 'High',
+                      color: primaryColor,
+                      isSelected: widget.task.priority == Priority.high,
+                      onTab: () {
+                        setState(() {
+                          widget.task.priority = Priority.high;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    flex: 1,
+                    child: PriorityCheckBox(
+                      label: 'Normal',
+                      color: const Color(0xfff09819),
+                      isSelected: widget.task.priority == Priority.normal,
+                      onTab: () {
+                        setState(() {
+                          widget.task.priority = Priority.normal;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    flex: 1,
+                    child: PriorityCheckBox(
+                      label: 'Low',
+                      color: const Color(0xff3be1f1),
+                      isSelected: widget.task.priority == Priority.low,
+                      onTab: () {
+                        setState(() {
+                          widget.task.priority = Priority.low;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  label: Text(
+                    'Add a task for today',
+                    style: themeData.textTheme.bodyText1!.apply(
+                      fontSizeFactor: 1.2,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+}
+
+class PriorityCheckBox extends StatelessWidget {
+  final String label;
+  final Color color;
+  final bool isSelected;
+  final GestureTapCallback onTab;
+
+  const PriorityCheckBox({
+    super.key,
+    required this.label,
+    required this.color,
+    required this.isSelected,
+    required this.onTab,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData themeData = Theme.of(context);
+    return InkWell(
+      onTap: onTab,
+      child: Container(
+        height: 40,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            width: 2,
+            color: secondaryTextColor.withOpacity(0.2),
+          ),
+        ),
+        child: Stack(
           children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                label: Text('Add a task for today'),
+            Center(
+              child: Text(label),
+            ),
+            Positioned(
+              right: 8,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: PriorityCheckBoxShape(
+                  value: isSelected,
+                  color: color,
+                ),
               ),
             ),
           ],
-        ));
+        ),
+      ),
+    );
+  }
+}
+
+class PriorityCheckBoxShape extends StatelessWidget {
+  final bool value;
+  final Color color;
+
+  const PriorityCheckBoxShape({
+    super.key,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themData = Theme.of(context);
+    return Container(
+      width: 16,
+      height: 16,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: value
+            ? null
+            : Border.all(
+                color: secondaryTextColor,
+                width: 2,
+              ),
+        color: color,
+      ),
+      child: value
+          ? Icon(
+              CupertinoIcons.check_mark,
+              color: themData.colorScheme.onPrimary,
+              size: 12,
+            )
+          : null,
+    );
   }
 }

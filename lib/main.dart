@@ -79,7 +79,7 @@ class HomeScreen extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => EditTaskScreen(),
+              builder: (context) => EditTaskScreen(task: Task()),
             ),
           );
         },
@@ -299,5 +299,3 @@ class MyCheckBox extends StatelessWidget {
     );
   }
 }
-
-
