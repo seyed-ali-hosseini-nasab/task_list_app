@@ -7,14 +7,15 @@ import 'package:task_list_app/main.dart';
 class EditTaskScreen extends StatefulWidget {
   final Task task;
 
-  EditTaskScreen({super.key, required this.task});
+  const EditTaskScreen({super.key, required this.task});
 
   @override
   State<EditTaskScreen> createState() => _EditTaskScreenState();
 }
 
 class _EditTaskScreenState extends State<EditTaskScreen> {
-  final TextEditingController _controller = TextEditingController();
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.task.name);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             widget.task.name = _controller.text;
-            widget.task.priority = Priority.low;
             if (widget.task.isInBox) {
               widget.task.save();
             } else {
@@ -76,7 +76,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     flex: 1,
                     child: PriorityCheckBox(
                       label: 'Normal',
-                      color: const Color(0xfff09819),
+                      color: priorityColors['normal']!,
                       isSelected: widget.task.priority == Priority.normal,
                       onTab: () {
                         setState(() {
@@ -90,7 +90,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     flex: 1,
                     child: PriorityCheckBox(
                       label: 'Low',
-                      color: const Color(0xff3be1f1),
+                      color: priorityColors['low']!,
                       isSelected: widget.task.priority == Priority.low,
                       onTab: () {
                         setState(() {
@@ -134,7 +134,6 @@ class PriorityCheckBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData themeData = Theme.of(context);
     return InkWell(
       onTap: onTab,
       child: Container(
