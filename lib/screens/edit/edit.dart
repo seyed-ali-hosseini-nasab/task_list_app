@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:task_list_app/data.dart';
+import 'package:provider/provider.dart';
+import 'package:task_list_app/data/data.dart';
+import 'package:task_list_app/data/repo/repository.dart';
 import 'package:task_list_app/main.dart';
 
 class EditTaskScreen extends StatefulWidget {
@@ -19,7 +20,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Box<Task> box = Hive.box(taskBoxName);
     final ThemeData themeData = Theme.of(context);
     return Scaffold(
         backgroundColor: themeData.colorScheme.surface,
@@ -32,12 +32,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             widget.task.name = _controller.text;
-            if (widget.task.isInBox) {
-              widget.task.save();
-            } else {
-              box.add(widget.task);
-            }
-
+            final repository =
+                Provider.of<Repository<Task>>(context, listen: false);
+            repository.createOrUpdate(widget.task);
             Navigator.of(context).pop();
           },
           label: Row(
